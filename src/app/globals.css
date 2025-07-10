@@ -41,75 +41,92 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Custom Copywrit.ai color palette */
+  --color-copywrit-navy: var(--copywrit-navy);
+  --color-copywrit-blue: var(--copywrit-blue);
+  --color-copywrit-cream: var(--copywrit-cream);
+  --color-copywrit-teal: var(--copywrit-teal);
+  --color-copywrit-red: var(--copywrit-red);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  
+  /* Your custom Copywrit.ai color palette */
+  --copywrit-navy: oklch(0.26 0.05 240);    /* #1d3557 - Dark Navy */
+  --copywrit-blue: oklch(0.55 0.08 225);    /* #457b9d - Medium Blue */  
+  --copywrit-cream: oklch(0.97 0.01 90);    /* #f1faee - Light Cream */
+  --copywrit-teal: oklch(0.80 0.04 200);    /* #a8dadc - Light Teal */
+  --copywrit-red: oklch(0.60 0.20 25);      /* #e63946 - Red Accent */
+  
+  /* Light theme using your palette */
+  --background: var(--copywrit-cream);      /* Light cream background */
+  --foreground: var(--copywrit-navy);       /* Dark navy text */
+  --card: oklch(1 0 0);                     /* Pure white cards */
+  --card-foreground: var(--copywrit-navy);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: var(--copywrit-navy);
+  --primary: var(--copywrit-navy);          /* Navy primary */
+  --primary-foreground: var(--copywrit-cream);
+  --secondary: var(--copywrit-teal);        /* Teal secondary */
+  --secondary-foreground: var(--copywrit-navy);
+  --muted: oklch(0.95 0.01 90);            /* Subtle cream */
+  --muted-foreground: var(--copywrit-blue);
+  --accent: var(--copywrit-blue);          /* Blue accent */
+  --accent-foreground: var(--copywrit-cream);
+  --destructive: var(--copywrit-red);      /* Red for destructive actions */
+  --border: oklch(0.90 0.02 200);          /* Light teal border */
+  --input: var(--copywrit-cream);
+  --ring: var(--copywrit-blue);
+  --chart-1: var(--copywrit-blue);
+  --chart-2: var(--copywrit-teal);
+  --chart-3: var(--copywrit-navy);
+  --chart-4: oklch(0.70 0.15 200);
+  --chart-5: oklch(0.75 0.10 240);
+  --sidebar: var(--copywrit-cream);
+  --sidebar-foreground: var(--copywrit-navy);
+  --sidebar-primary: var(--copywrit-navy);
+  --sidebar-primary-foreground: var(--copywrit-cream);
+  --sidebar-accent: var(--copywrit-teal);
+  --sidebar-accent-foreground: var(--copywrit-navy);
+  --sidebar-border: oklch(0.90 0.02 200);
+  --sidebar-ring: var(--copywrit-blue);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Dark theme using your palette */
+  --background: var(--copywrit-navy);       /* Dark navy background */
+  --foreground: var(--copywrit-cream);      /* Light cream text */
+  --card: oklch(0.20 0.03 240);            /* Slightly lighter navy */
+  --card-foreground: var(--copywrit-cream);
+  --popover: oklch(0.20 0.03 240);
+  --popover-foreground: var(--copywrit-cream);
+  --primary: var(--copywrit-cream);         /* Cream primary in dark */
+  --primary-foreground: var(--copywrit-navy);
+  --secondary: oklch(0.30 0.05 240);       /* Darker navy secondary */
+  --secondary-foreground: var(--copywrit-cream);
+  --muted: oklch(0.25 0.04 240);
+  --muted-foreground: var(--copywrit-teal);
+  --accent: var(--copywrit-blue);          /* Blue accent */
+  --accent-foreground: var(--copywrit-cream);
+  --destructive: var(--copywrit-red);      /* Red for destructive actions */
+  --border: oklch(0.35 0.04 240);
+  --input: var(--copywrit-navy);
+  --ring: var(--copywrit-blue);
+  --chart-1: var(--copywrit-blue);
+  --chart-2: var(--copywrit-teal);
+  --chart-3: var(--copywrit-cream);
+  --chart-4: oklch(0.60 0.15 200);
+  --chart-5: oklch(0.65 0.10 240);
+  --sidebar: var(--copywrit-navy);
+  --sidebar-foreground: var(--copywrit-cream);
+  --sidebar-primary: var(--copywrit-blue);
+  --sidebar-primary-foreground: var(--copywrit-cream);
+  --sidebar-accent: oklch(0.25 0.04 240);
+  --sidebar-accent-foreground: var(--copywrit-cream);
+  --sidebar-border: oklch(0.35 0.04 240);
+  --sidebar-ring: var(--copywrit-blue);
 }
 
 @layer base {

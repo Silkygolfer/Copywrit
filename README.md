@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Copywrit Dev
 
-## Getting Started
+A modern AI-powered copywriting assistant built with Next.js, Convex, and Clerk authentication.
 
-First, run the development server:
+## Features
+
+- 🔐 **Clerk Authentication** - Secure user authentication with email and social providers
+- 💬 **AI Chat Interface** - Powered by Google's Gemini AI
+- 📁 **Client Management** - Organize projects by client with custom contexts
+- 🗃️ **File Upload & Context** - Upload files to provide context for better AI responses
+- ⚡ **Real-time Updates** - Live chat with streaming responses
+- 🎨 **Modern UI** - Built with Tailwind CSS and Radix UI components
+
+## Quick Start
+
+### 1. Clone and Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo>
+cd copywrit-dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Set up Clerk Authentication
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
+2. Create a new application
+3. Copy your API keys
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Set up Convex
+
+1. Install Convex CLI: `npm install -g convex`
+2. Run: `npx convex dev`
+3. Follow the setup instructions
+
+### 4. Environment Variables
+
+Create a `.env.local` file:
+
+```bash
+# Convex
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# Google AI (for chat functionality)
+GOOGLE_GENERATIVE_AI_API_KEY=your-google-ai-key
+```
+
+### 5. Set Convex Environment Variables
+
+In your Convex dashboard, add:
+- `CLERK_SECRET_KEY`
+
+### 6. Run the Application
+
+```bash
+# Terminal 1: Start Convex
+npm run convex:dev
+
+# Terminal 2: Start Next.js
+npm run dev
+```
+
+Visit `http://localhost:3000`
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js app router
+│   ├── (auth)/            # Auth pages (login, register)
+│   ├── (chat)/            # Chat interface
+│   ├── (main)/            # Landing page
+│   └── api/               # API routes
+├── components/            # React components
+│   ├── auth/              # Authentication components
+│   ├── chat/              # Chat interface components
+│   ├── main/              # Landing page components
+│   └── ui/                # Reusable UI components
+├── hooks/                 # Custom React hooks
+└── lib/                   # Utilities and services
+
+convex/                    # Convex backend
+├── schema.ts              # Database schema
+├── users.ts               # User management
+├── chats.ts               # Chat functionality
+├── clients.ts             # Client management
+└── files.ts               # File handling
+```
+
+## Authentication Flow
+
+1. **Frontend**: Users authenticate via Clerk's UI components
+2. **Middleware**: Routes are protected using Clerk middleware
+3. **API Routes**: Clerk tokens validate API requests
+4. **Database**: User profiles are automatically created in Convex
+
+## Development
+
+### Adding New Features
+
+1. **Database Changes**: Update `convex/schema.ts`
+2. **API Functions**: Add functions in `convex/` directory
+3. **Frontend**: Create components in `src/components/`
+4. **Routing**: Add pages in `src/app/`
+
+### Key Commands
+
+```bash
+npm run dev              # Start development server
+npm run build           # Build for production
+npm run convex:dev      # Start Convex backend
+npm run convex:codegen  # Generate TypeScript types
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Convex Documentation](https://docs.convex.dev)
+- [Clerk Documentation](https://clerk.com/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)

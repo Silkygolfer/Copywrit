@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
-import { TRPCReactProvider } from "@/trpc/react";
-import Header from "@/components/layout/header";
-import './globals.css'
+import { Inter } from "next/font/google"
+import '@/app/globals.css'
+import { ClientProviders } from "@/app/providers/ClientProviders";
 
-export const metadata: Metadata = {
-  title: "Copywrit.ai",
-  description: "Copywrit.ai",
-};
+const inter = Inter({ subsets: ["latin"] })
 
 export default function RootLayout({
   children,
@@ -14,12 +10,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body>
-        <Header />
-        <TRPCReactProvider>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
+      <body className={inter.className}>
+        <ClientProviders>
           {children}
-        </TRPCReactProvider>
+        </ClientProviders>
       </body>
     </html>
   );
