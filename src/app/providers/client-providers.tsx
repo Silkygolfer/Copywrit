@@ -3,7 +3,7 @@
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
-import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import { ThemeProvider } from "@/app/providers/theme-provider";
 import { Toaster } from "sonner";
 import { ReactNode } from "react";
 

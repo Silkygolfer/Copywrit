@@ -1,10 +1,9 @@
-'use client'
-import Chat from '@/components/chat/Chat'
+import Chat from '@/components/chat/chat'
 
 export default function ChatPage() {
   return (
     <div className="h-full bg-copywrit-blue/10">
-      <Chat />
+      <Chat threadId={null} />
     </div>
   );
 }

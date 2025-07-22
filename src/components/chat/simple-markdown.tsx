@@ -2,7 +2,7 @@
 import { memo } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { cn } from '@/lib/utils/twUtils';
+import { cn } from '@/lib/utils/tw-utils';
 
 interface SimpleMarkdownProps {
   content: string;

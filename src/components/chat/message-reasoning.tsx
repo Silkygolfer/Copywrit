@@ -1,6 +1,6 @@
 'use client'
 import { memo, useState } from 'react';
-import SimpleMarkdown from './SimpleMarkdown';
+import SimpleMarkdown from './simple-markdown';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 function PureMessageReasoning({

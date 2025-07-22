@@ -2,17 +2,22 @@
 import { ArrowUpIcon } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Textarea } from '../ui/textarea';
-import { cn } from '@/lib/utils/twUtils';
+import { cn } from '@/lib/utils/tw-utils';
 import { Button } from '../ui/button';
-import useAutoResizeTextarea from '../../hooks/useAutoResizeTextArea';
-import { nanoid } from 'nanoid';
+import useAutoResizeTextarea from '../../hooks/use-auto-resize-textarea';
 import { StopIcon } from '../ui/icons';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
+import { Id } from '../../../convex/_generated/dataModel';
+import { v4 as uuidv4 } from 'uuid';
+import { UIMessage } from 'ai';
+import { api } from '../../../convex/_generated/api';
+import { useAction } from 'convex/react';
+import { useBusinessContext } from '@/app/providers/business-provider';
 
 interface ChatInputProps {
-  threadId?: string;
-  onSendMessage: (content: string) => Promise<void>;
+  threadId: Id<"threads"> | null;
+  onSendMessage: (content: UIMessage) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -35,23 +40,30 @@ function PureChatInput({
 
   const router = useRouter();
   const {user} = useUser();
+  const {businessId} = useBusinessContext()
   const [input, setInput] = useState('');
 
+  // Mutations
+  const createThreadAction = useAction(api.threads.createThreadAction);
+
   const isDisabled = useMemo(
-    () => !input.trim() || isLoading || !user,
-    [input, isLoading, user]
+    () => !input.trim() || isLoading,
+    [input, isLoading]
   );
 
   const handleSubmit = useCallback(async () => {
     const currentInput = textareaRef.current?.value || input;
-
+    const messageId = uuidv4() as Id<"messages">;
     if (!currentInput.trim() || isLoading || !user) return;
 
-    const messageId = nanoid();
-
     if (!threadId) {
-      // For new threads: store message in session storage and navigate
-      const newThreadId = nanoid();
+      const newThreadId = await createThreadAction({
+        title: "New Chat",
+        clerkUserId: user?.id,
+        businessId: businessId,
+        initialMessage: currentInput.trim(),
+      });
+
       const userMessage = {
         id: messageId,
         content: currentInput.trim(),
@@ -61,37 +73,42 @@ function PureChatInput({
       };
       
       try {
-        // Store initial message in session storage for the new page
-        sessionStorage.setItem('initialMessage', JSON.stringify({
+        localStorage.setItem('initialMessage', JSON.stringify({
           threadId: newThreadId,
           message: userMessage,
-          title: currentInput.substring(0, 50) || "New Chat"
+          title: "New Chat"
         }));
+
+        router.push(`/chat/${newThreadId}`);
         
         setInput('');
         adjustHeight(true);
-        // Navigate immediately - new page will handle thread creation and streaming
-        router.push(`/chat/${newThreadId}`);
         return;
       } catch (error) {
         console.error('Failed to store initial message:', error);
       }
     } 
-    // For existing threads: use the new onSendMessage callback
-    try {
-      // Clear input immediately for better UX
-      setInput('');
-      adjustHeight(true);
-      
-      // Send message (don't await to avoid blocking UI)
-      onSendMessage(currentInput.trim()).catch(error => {
+
+    if (threadId) {
+      try {
+        setInput('');
+        adjustHeight(true);
+        
+        const message: UIMessage = {
+          id: messageId,
+          content: currentInput.trim(),
+          role: "user",
+          parts: [{ type: 'text', text: currentInput.trim() }],
+          createdAt: new Date(),
+        };
+        onSendMessage(message).catch(error => {
+          console.error('Failed to send message:', error);
+        });
+      } catch (error) {
         console.error('Failed to send message:', error);
-        // Could restore input on error if needed
-        // setInput(currentInput.trim());
-      });
-    } catch (error) {
-      console.error('Failed to send message:', error);
+      }
     }
+
   }, [
     input,
     isLoading,

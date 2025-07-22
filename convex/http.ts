@@ -1,37 +1,28 @@
 import { httpRouter } from "convex/server";
-import { httpAction } from "./_generated/server";
-import { streamChat } from "./chat";
+import { corsRouter } from "convex-helpers/server/cors"
+import { getFile, uploadFile } from "./files";
 
 const http = httpRouter();
+const cors = corsRouter(http, {
+    allowedOrigins: [
+        "http://localhost:3000",
+        'http://127.0.0.1:3210',
+        "http://11.26.129.166:3000"
+    ],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    allowCredentials: true
+})
 
-http.route({
-    path: "/chat-stream",
+cors.route({
+    path: "/api/r2",
+    method: "GET",
+    handler: getFile
+})
+
+cors.route({
+    path: "/api/upload",
     method: "POST",
-    handler: streamChat,
-  });
-  
-  http.route({
-    path: "/chat-stream",
-    method: "OPTIONS",
-    handler: httpAction(async (_, request) => {
-      const headers = request.headers;
-      if (
-        headers.get("Origin") !== null &&
-        headers.get("Access-Control-Request-Method") !== null &&
-        headers.get("Access-Control-Request-Headers") !== null
-      ) {
-        return new Response(null, {
-          headers: new Headers({
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type, Digest, Authorization",
-            "Access-Control-Max-Age": "86400",
-          }),
-        });
-      } else {
-        return new Response();
-      }
-    }),
-  });
+    handler: uploadFile
+})
   
 export default http;

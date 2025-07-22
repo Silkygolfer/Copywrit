@@ -1,19 +1,13 @@
-'use client'
-import Chat from '@/components/chat/Chat'
-import { useParams } from 'next/navigation'
+import Chat from '@/components/chat/chat'
+import { Id } from "../../../../../convex/_generated/dataModel"
 
 
-export default function ChatPage() {
-  const { threadId } = useParams<{ threadId: string }>();
-
-  // if no threadId, render error UI
-  if (!threadId) {
-    return <div>Error: No threadId provided</div>;
-  }
+export default async function ChatPage({ params }: { params: Promise<{ threadId: Id<"threads"> }> }) {
+  const { threadId } = await params;
 
   return (
     <div className="h-full bg-copywrit-blue/10">
-      <Chat threadId={threadId} clientId='12345'/>
+      <Chat threadId={threadId} />
     </div>
   );
 }

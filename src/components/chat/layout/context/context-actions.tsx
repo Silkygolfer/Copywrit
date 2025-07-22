@@ -1,21 +1,22 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { FileText, MoreVertical, Upload, Files } from "lucide-react"
-import ContextUploadButton from "./ContextUploadButton"
-import { useFileUpload } from "@/hooks/useFileUpload"
-import { ViewContextModal } from "./ViewContextModal"
+import { MoreVertical, Files } from "lucide-react"
+import ContextUploadButton from "./context-upload-button"
+import { useFileUpload } from "@/hooks/use-file-upload"
+import { ViewContextModal } from "./view-context-modal"
 import { useState } from "react"
 
 interface ContextActionsDropdownProps {
-    clientId: string;
-    clientName: string;
+    businessId: string;
+    businessName: string;
 }
 
-export const ContextActionsDropdown = ({ clientId, clientName }: ContextActionsDropdownProps) => {
+export const ContextActionsDropdown = ({ businessId, businessName }: ContextActionsDropdownProps) => {
 
     const { openFilePicker, isUploading } = useFileUpload({ 
-        clientId, 
-        clientName 
+        businessId: businessId, 
+        businessName: businessName 
     });
 
     const [isOpenContextModal, setOpenContextModal] = useState(false);

@@ -1,13 +1,14 @@
 'use client'
 import { useState } from 'react';
 import { Button } from '../ui/button';
-import { cn } from '@/lib/utils/twUtils';
+import { cn } from '@/lib/utils/tw-utils';
 import { Check, Copy } from 'lucide-react';
+import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
 
 interface MessageControlsProps {
-  threadId: string;
-  message: UIMessage;
+  threadId: Id<"threads">;
+  message: UIMessage & { streamId: Id<'streams'> };
   content: string;
 }
 

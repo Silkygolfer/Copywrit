@@ -8,9 +8,13 @@
  * @module
  */
 
-import type * as chat from "../chat.js";
+import type * as businesses from "../businesses.js";
+import type * as chunks from "../chunks.js";
 import type * as clerk from "../clerk.js";
+import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as lib_file_constants from "../lib/file_constants.js";
+import type * as lib_supermemory from "../lib/supermemory.js";
 import type * as messages from "../messages.js";
 import type * as streaming from "../streaming.js";
 import type * as threads from "../threads.js";
@@ -32,9 +36,13 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  chat: typeof chat;
+  businesses: typeof businesses;
+  chunks: typeof chunks;
   clerk: typeof clerk;
+  files: typeof files;
   http: typeof http;
+  "lib/file_constants": typeof lib_file_constants;
+  "lib/supermemory": typeof lib_supermemory;
   messages: typeof messages;
   streaming: typeof streaming;
   threads: typeof threads;
@@ -53,38 +61,127 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  persistentTextStreaming: {
+  r2: {
     lib: {
-      addChunk: FunctionReference<
+      deleteMetadata: FunctionReference<
         "mutation",
         "internal",
-        { final: boolean; streamId: string; text: string },
-        any
+        { bucket: string; key: string },
+        null
       >;
-      createStream: FunctionReference<"mutation", "internal", {}, any>;
-      getStreamStatus: FunctionReference<
-        "query",
+      deleteObject: FunctionReference<
+        "mutation",
         "internal",
-        { streamId: string },
-        "pending" | "streaming" | "done" | "error" | "timeout"
-      >;
-      getStreamText: FunctionReference<
-        "query",
-        "internal",
-        { streamId: string },
         {
-          status: "pending" | "streaming" | "done" | "error" | "timeout";
-          text: string;
+          accessKeyId: string;
+          bucket: string;
+          endpoint: string;
+          key: string;
+          secretAccessKey: string;
+        },
+        null
+      >;
+      deleteR2Object: FunctionReference<
+        "action",
+        "internal",
+        {
+          accessKeyId: string;
+          bucket: string;
+          endpoint: string;
+          key: string;
+          secretAccessKey: string;
+        },
+        null
+      >;
+      getMetadata: FunctionReference<
+        "query",
+        "internal",
+        {
+          accessKeyId: string;
+          bucket: string;
+          endpoint: string;
+          key: string;
+          secretAccessKey: string;
+        },
+        {
+          bucket: string;
+          bucketLink: string;
+          contentType?: string;
+          key: string;
+          lastModified: string;
+          link: string;
+          sha256?: string;
+          size?: number;
+          url: string;
+        } | null
+      >;
+      listMetadata: FunctionReference<
+        "query",
+        "internal",
+        {
+          accessKeyId: string;
+          bucket: string;
+          cursor?: string;
+          endpoint: string;
+          limit?: number;
+          secretAccessKey: string;
+        },
+        {
+          continueCursor: string;
+          isDone: boolean;
+          page: Array<{
+            bucket: string;
+            bucketLink: string;
+            contentType?: string;
+            key: string;
+            lastModified: string;
+            link: string;
+            sha256?: string;
+            size?: number;
+            url: string;
+          }>;
+          pageStatus?: null | "SplitRecommended" | "SplitRequired";
+          splitCursor?: null | string;
         }
       >;
-      setStreamStatus: FunctionReference<
+      store: FunctionReference<
+        "action",
+        "internal",
+        {
+          accessKeyId: string;
+          bucket: string;
+          endpoint: string;
+          secretAccessKey: string;
+          url: string;
+        },
+        any
+      >;
+      syncMetadata: FunctionReference<
+        "action",
+        "internal",
+        {
+          accessKeyId: string;
+          bucket: string;
+          endpoint: string;
+          key: string;
+          onComplete?: string;
+          secretAccessKey: string;
+        },
+        null
+      >;
+      upsertMetadata: FunctionReference<
         "mutation",
         "internal",
         {
-          status: "pending" | "streaming" | "done" | "error" | "timeout";
-          streamId: string;
+          bucket: string;
+          contentType?: string;
+          key: string;
+          lastModified: string;
+          link: string;
+          sha256?: string;
+          size?: number;
         },
-        any
+        { isNew: boolean }
       >;
     };
   };

@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import { CheckIcon, ChevronDown, PlusIcon } from "lucide-react"
 import { DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenu } from "@/components/ui/dropdown-menu";

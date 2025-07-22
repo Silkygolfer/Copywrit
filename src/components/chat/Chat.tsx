@@ -1,31 +1,33 @@
 'use client'
-import Messages from './Messages';
-import ChatInput from './ChatInput';
-import { useCallback, useRef, useState, useMemo } from 'react';
-import { UIMessage } from 'ai';
-import { useMutation, useQuery } from 'convex/react';
+import Messages from './messages';
+import ChatInput from './chat-input';
+import { useCallback, useRef, useState, useEffect } from 'react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
+import { Id } from '../../../convex/_generated/dataModel';
+import { UIMessage } from 'ai';
 import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
-import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
+import { useBusinessContext } from '@/app/providers/business-provider';
 
 interface ChatProps {
-  threadId?: string
+  threadId: Id<"threads"> | null;
 }
 
 export default function Chat({ threadId }: ChatProps) {
   // Auth
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+
+  // Business
+  const { businessId } = useBusinessContext();
 
   // Queries
-  const messages = useQuery(
-    api.messages.listMessages, 
-    threadId ? { threadId } : "skip"
-  );
+  const dbmessages = useQuery(api.messages.listMessages, threadId ? { threadId } : "skip");
+  const messages: (UIMessage & { streamId: Id<'streams'> })[] = dbmessages?.map(convertDBMessageToUIMessage) || [];
 
   // Mutations
-  const addUserMessage = useMutation(api.messages.addMessage);
-  const addAssistantMessage = useMutation(api.messages.addMessage);
+  const sendMessage = useMutation(api.messages.sendMessage);
 
   // Refs
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -33,6 +35,51 @@ export default function Chat({ threadId }: ChatProps) {
     messageRefs.current[id] = ref;
   }, []);
 
+  // State - track sent message IDs instead of thread IDs
+  const [sentMessageIds, setSentMessageIds] = useState<Set<string>>(new Set());
+
+  const handleSendMessage = useCallback(async (message: UIMessage) => {
+
+    if (!threadId || !user) {
+      console.log("Early return: missing threadId or user");
+      return;
+    }
+
+    try {
+      // Generate a unique message ID
+      const messageId = uuidv4();
+      // Create the message in the database
+      await sendMessage({
+        messageId: messageId,
+        threadId: threadId,
+        content: message.content,
+        role: message.role,
+        parts: message.parts,
+        clerkUserId: user.id,
+      });
+
+      // Add the message ID to our tracking set
+      setSentMessageIds(prev => new Set([...prev, messageId]));
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  }, [threadId, user, sendMessage]);
+
+  // Handle initial message from localStorage
+  useEffect(() => {
+    if (threadId) {
+      try {
+        const initialMessage = localStorage.getItem('initialMessage')
+        if (initialMessage) {
+          const parsedMessage = JSON.parse(initialMessage);
+          handleSendMessage(parsedMessage.message as UIMessage);
+          localStorage.removeItem('initialMessage')
+        }
+      } catch (error) {
+        console.error('Failed to send initial message:', error);
+      }
+    }
+  }, [threadId]); // Dependencies ensure this runs when threadId or user changes
 
   return (
     <div className="relative w-full h-full flex flex-col">
@@ -44,10 +91,10 @@ export default function Chat({ threadId }: ChatProps) {
         ) : (
           <Messages
             threadId={threadId}
-            messages={messages}
+            messages={messages || []}
             registerRef={registerRef}
-            activeStreamId={activeStreamId}
-            onStreamComplete={handleStreamComplete}
+            sentMessageIds={sentMessageIds}
+            businessId={businessId}
           />
         )}
       </div>
@@ -55,8 +102,8 @@ export default function Chat({ threadId }: ChatProps) {
       <div className="flex-shrink-0">
         <ChatInput
           threadId={threadId}
-          onSendMessage={sendMessage}
-          isLoading={isStreaming}
+          onSendMessage={handleSendMessage}
+          isLoading={!isLoaded}
         />
       </div>
     </div>

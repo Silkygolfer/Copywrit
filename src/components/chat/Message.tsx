@@ -1,59 +1,25 @@
 'use client'
-import { memo, useEffect } from 'react';
-import SimpleMarkdown from './SimpleMarkdown';
-import { cn } from '@/lib/utils/twUtils';
-import { UIMessage } from 'ai';
+import { memo } from 'react';
+import SimpleMarkdown from './simple-markdown';
+import { cn } from '@/lib/utils/tw-utils';
 import equal from 'fast-deep-equal';
-import MessageControls from './MessageControls';
-import MessageReasoning from './MessageReasoning';
-import { MessageToolInvocation } from './MessageToolInvocation';
-import { api } from '../../../convex/_generated/api';
-import { useStream } from '@convex-dev/persistent-text-streaming/react';
-import { StreamId } from '@convex-dev/persistent-text-streaming';
+import MessageControls from './message-controls';
+import MessageReasoning from './message-reasoning';
+import { MessageToolInvocation } from './message-tool-invocation';
+import { Id } from '../../../convex/_generated/dataModel';
+import { UIMessage } from 'ai';
 
 function PureMessage({
   threadId,
   message,
-  isActiveStream,
-  onStreamComplete,
   registerRef,
+  sentMessageIds,
 }: {
-  threadId: string;
-  message: UIMessage & { streamId?: string };
-  isActiveStream: boolean;
-  onStreamComplete: (streamText: string) => Promise<void>;
+  threadId: Id<"threads">;
+  message: UIMessage & { streamId: Id<'streams'> };
   registerRef: (id: string, ref: HTMLDivElement | null) => void;
+  sentMessageIds: Set<string>;
 }) {
-  // Only use streaming for messages that are actively streaming
-  const { text: streamText, status: streamStatus } = useStream(
-    api.streaming.getStreamBody,
-    new URL(`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/chat-stream`),
-    isActiveStream, // Only drive when this message is the active stream
-    message.streamId as StreamId
-  );
-
-  // Handle stream completion
-  useEffect(() => {
-    if (isActiveStream && streamStatus === 'done' && streamText) {
-      onStreamComplete(streamText);
-    }
-  }, [isActiveStream, streamStatus, streamText, onStreamComplete]);
-
-  // Determine what text to display
-  const getDisplayText = (part: { type: string; text: string }) => {
-    if (message.role === 'user') {
-      return part.text; // Always use DB content for user messages
-    }
-    
-    // For assistant messages during streaming
-    if (isActiveStream && streamText) {
-      return streamText; // Use live streaming text
-    }
-    
-    // For assistant messages after streaming or non-streaming
-    return part.text; // Use DB content
-  };
-
   return (
     <div
       role="article"
@@ -87,40 +53,38 @@ function PureMessage({
         }
 
         if (type === 'text') {
-          const displayText = getDisplayText(part);
-          
-          return message.role === 'user' ? (
-            <div
-              key={key}
-              className="relative group px-5 py-4 rounded-2xl bg-copywrit-navy text-copywrit-cream shadow-lg border border-copywrit-cream/20 max-w-[80%] ml-auto"
-              ref={(el) => registerRef(message.id, el)}
-            >
-              <div className="mb-2">
-                {displayText}
-              </div>
-              <MessageControls
-                threadId={threadId}
-                content={displayText}
-                message={message}
-              />
-            </div>
-          ) : (
-            <div key={key} className="group flex flex-col gap-3 w-full">
-              <div className="bg-transparent text-copywrit-cream rounded-2xl p-5 max-w-[85%]">
-                <SimpleMarkdown 
-                  content={displayText} 
-                />
-              </div>
-              {/* Only show controls when not actively streaming */}
-              {!(isActiveStream && streamStatus === 'streaming') && (
+          if (message.role === 'user') {
+            return (
+              <div
+                key={key}
+                className="relative group px-5 py-4 rounded-2xl bg-copywrit-navy text-copywrit-cream shadow-lg border border-copywrit-cream/20 max-w-[80%] ml-auto"
+                ref={(el) => registerRef(message.id, el)}
+              >
+                <div className="mb-2">
+                  {part.text}
+                </div>
                 <MessageControls
                   threadId={threadId}
-                  content={displayText}
+                  content={part.text}
                   message={message}
                 />
-              )}
-            </div>
-          );
+              </div>
+            );
+          } else {
+            // Assistant message - render from database
+            return (
+              <div key={key} className="group flex flex-col gap-3 w-full">
+                <div className="bg-transparent text-copywrit-cream rounded-2xl p-5 max-w-[85%]">
+                  <SimpleMarkdown content={part.text} />
+                </div>
+                <MessageControls
+                  threadId={threadId}
+                  content={part.text}
+                  message={message}
+                />
+              </div>
+            );
+          }
         }
       })}
     </div>
@@ -128,9 +92,9 @@ function PureMessage({
 }
 
 const PreviewMessage = memo(PureMessage, (prevProps, nextProps) => {
-  if (prevProps.isActiveStream !== nextProps.isActiveStream) return false;
   if (prevProps.message.id !== nextProps.message.id) return false;
   if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+  if (prevProps.sentMessageIds.has(prevProps.message.id) !== nextProps.sentMessageIds.has(nextProps.message.id)) return false;
   return true;
 });
 

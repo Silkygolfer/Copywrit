@@ -24,7 +24,6 @@ export const webSearchTool: ToolConfig = {
   },
   execute: async (params: { query: string }) => {
     // This would integrate with a search API
-    console.log('Searching for:', params.query);
     return {
       results: [
         {
@@ -57,7 +56,6 @@ export const imageGenerationTool: ToolConfig = {
   },
   execute: async (params: { prompt: string; style?: string }) => {
     // This would integrate with an image generation API
-    console.log('Generating image:', params.prompt, 'in style:', params.style);
     return {
       imageUrl: 'https://example.com/generated-image.jpg',
       prompt: params.prompt,
@@ -85,7 +83,6 @@ export const brandAnalysisTool: ToolConfig = {
   },
   execute: async (params: { brandName: string; content: string }) => {
     // This would integrate with brand analysis logic
-    console.log('Analyzing brand:', params.brandName, 'for content:', params.content);
     return {
       brandConsistency: 0.85,
       suggestions: [

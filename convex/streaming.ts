@@ -1,28 +1,36 @@
-import { mutation, query } from "./_generated/server";
-import { components } from "./_generated/api";
-import { PersistentTextStreaming, StreamIdValidator, StreamId } from "@convex-dev/persistent-text-streaming";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Initialize the persistent text streaming component
-export const streamingComponent = new PersistentTextStreaming(components.persistentTextStreaming);
 
-export const getStreamBody = query({
+export const createStream = internalMutation({
     args: {
-      streamId: StreamIdValidator,
+        threadId: v.id('threads'),
     },
     handler: async (ctx, args) => {
-      return await streamingComponent.getStreamBody(
-        ctx,
-        args.streamId as StreamId
-      );
-    },
-  });
+        const streamId = await ctx.db.insert("streams", {
+            threadId: args.threadId,
+            status: "pending",
+        });
+        return streamId;
+    }
+})
 
-  export const createStream = mutation({
+export const updateStatus = mutation({
     args: {
-      threadId: v.string(),
+        streamId: v.id('streams'),
+        status: v.union(v.literal('pending'), v.literal('streaming'), v.literal('done'), v.literal('error'), v.literal('timeout')),
     },
     handler: async (ctx, args) => {
-      return await streamingComponent.createStream(ctx);
+        await ctx.db.patch(args.streamId, { status: args.status });
+    }
+})
+
+export const getStreamStatus = query({
+    args: {
+        streamId: v.id('streams'),
     },
-  });
+    handler: async (ctx, args) => {
+        const stream = await ctx.db.get(args.streamId);
+        return stream?.status || null;
+    }
+})

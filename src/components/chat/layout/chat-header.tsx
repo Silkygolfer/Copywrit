@@ -1,13 +1,13 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ClientActionsDropdown } from "@/components/chat/layout/ClientActionsDropdown";
-import { ContextActionsDropdown } from "@/components/chat/layout/ContextActionsDropdown";
+import { ClientActionsDropdown } from "@/components/chat/layout/clients/client-actions";
+import { ContextActionsDropdown } from "@/components/chat/layout/context/context-actions";
 
 interface ChatHeaderProps {
-    clientId?: string;
-    clientName?: string;
+    businessId?: string;
+    businessName?: string;
 }
 
-export const ChatHeader = ({ clientId = "default-client", clientName = "Default Client" }: ChatHeaderProps) => {
+export const ChatHeader = ({ businessId = 'm17808q908578ckq3jry6pcpjn7kwrwm', businessName = "Copywrit" }: ChatHeaderProps) => {
     
 
     return (
@@ -20,7 +20,7 @@ export const ChatHeader = ({ clientId = "default-client", clientName = "Default 
             </div>
             <div className="flex items-center p-2">
                 <div className="flex items-center gap-2">
-                    <ContextActionsDropdown clientId={clientId} clientName={clientName} />
+                    <ContextActionsDropdown businessId={businessId} businessName={businessName} />
                 </div>
             </div>
         </header>

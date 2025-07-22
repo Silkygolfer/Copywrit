@@ -1,16 +1,16 @@
 import { UIMessage } from "ai";
-import { Doc } from "../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../convex/_generated/dataModel";
 
 type Message = Doc<"messages">;
 
-export const convertDBMessageToUIMessage = (message: Message): UIMessage & { streamId?: string } => {
+export const convertDBMessageToUIMessage = (message: Message): UIMessage & { streamId: Id<'streams'> }  => {
     return {
-        id: message._id,
+        id: message.messageId,
         role: message.role,
         content: message.content,
         parts: message.parts || [{ type: "text", text: message.content }],
         createdAt: new Date(message.createdAt),
-        streamId: message.streamId,
+        streamId: message.streamId as Id<'streams'>,
     }
 }
 
