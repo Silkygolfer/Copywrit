@@ -2,19 +2,30 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar'
 import Link from 'next/link'
 import LogOutButton from '../log-out-button'
-import { memo } from 'react'
+import { memo, useState, useEffect } from 'react'
 import equal from 'fast-deep-equal'
 import { Preloaded, usePreloadedQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import { Doc } from '../../../../convex/_generated/dataModel'
 import { Ellipsis } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThreadMenu } from './thread-menu'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 
 interface ChatSidebarProps {
     threads: Preloaded<typeof api.threads.listThreads>
 }
 
 const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
+    // state
+    const [openMenuThreadId, setOpenMenuThreadId] = useState<string | null>(null);
+    const [showRenameDialog, setShowRenameDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [currentThread, setCurrentThread] = useState<Doc<'threads'> | null>(null);
+
     const threadsData = usePreloadedQuery(threads);
     return (
         <Sidebar>
@@ -37,7 +48,7 @@ const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
                             <SidebarMenuButton
                             asChild
                             key={thread._id}
-                            className="flex items-center cursor-pointer hover:bg-copywrit-blue/20 hover:text-copywrit-cream rounded-sm py-2 pl-2 list-none w-full"
+                            className="flex items-center cursor-pointer hover:bg-copywrit-blue/20 hover:text-copywrit-cream rounded-sm list-none w-full"
                             >
                                 <div className="flex items-center w-full">
                                     <Link href={`/chat/${thread._id}`} className="flex-1 min-w-0">
@@ -46,9 +57,16 @@ const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
                                         </span>
                                     </Link>
                                     <div className="flex items-center justify-center">
-                                        <Button variant="ghost" size="icon" className='size-8!'>
-                                            <Ellipsis />
-                                        </Button>
+                                        <ThreadMenu
+                                          onRename={() => {
+                                            setCurrentThread(thread);
+                                            setShowRenameDialog(true);
+                                          }}
+                                          onDelete={() => {
+                                            setCurrentThread(thread);
+                                            setShowDeleteDialog(true);
+                                          }}
+                                        />
                                     </div>
                                 </div>
                             </SidebarMenuButton>
@@ -63,6 +81,9 @@ const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
+            {/* Dialogs for rename and delete */}
+            <RenameDialog open={showRenameDialog} onOpenChange={setShowRenameDialog} thread={currentThread} />
+            <DeleteDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog} thread={currentThread} />
         </Sidebar>
     )
 }, (prevProps, nextProps) => {
@@ -71,6 +92,93 @@ const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
 });
 
 PureChatSidebar.displayName = 'PureChatSidebar';
+
+// --- Dialog Components ---
+
+interface RenameDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  thread: Doc<'threads'> | null;
+}
+
+export function RenameDialog({ open, onOpenChange, thread }: RenameDialogProps) {
+  const [value, setValue] = useState(thread?.title || '');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && thread) setValue(thread.title);
+  }, [open, thread]);
+
+  const handleRename = async () => {
+    setIsLoading(true);
+    // TODO: Implement mutation call to rename thread here
+    setTimeout(() => {
+      setIsLoading(false);
+      onOpenChange(false);
+    }, 1000);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o: boolean) => { if (!isLoading) onOpenChange(o); }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Rename Thread</DialogTitle>
+        </DialogHeader>
+        <Input
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder="Enter thread name"
+          autoFocus
+          disabled={isLoading}
+        />
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>Cancel</Button>
+          <Button onClick={handleRename} disabled={isLoading || !value.trim()}>
+            {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />Renaming...</>) : 'Rename'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface DeleteDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  thread: Doc<'threads'> | null;
+}
+
+export function DeleteDialog({ open, onOpenChange, thread }: DeleteDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    // TODO: Implement mutation call to delete thread here
+    setTimeout(() => {
+      setIsLoading(false);
+      onOpenChange(false);
+    }, 1000);
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={(o: boolean) => { if (!isLoading) onOpenChange(o); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Thread</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete <span className="font-bold">{thread?.title}</span>? This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isLoading}>
+            {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />Deleting...</>) : 'Delete'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 // Container component that handles the hooks
 export const ChatSidebar = ({ threads }: { threads: Preloaded<typeof api.threads.listThreads> }) => {
