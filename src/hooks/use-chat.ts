@@ -97,11 +97,12 @@ async function startStream(
   while (true) {
     try {
       const { done, value } = await reader.read();
+      const decodedText = new TextDecoder().decode(value, { stream: true });      
       if (done) {
-        onUpdate(new TextDecoder().decode(value, { stream: true }));
+        onUpdate(decodedText);
         return true;
       }
-      onUpdate(new TextDecoder().decode(value, { stream: true }));
+      onUpdate(decodedText);
     } catch (e) {
       console.error("Error reading stream", e);
       return false;

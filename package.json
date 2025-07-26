@@ -11,6 +11,7 @@
     "convex:dev": "convex dev"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.12",
     "@ai-sdk/google": "^1.2.19",
     "@ai-sdk/react": "^1.2.12",
     "@clerk/clerk-react": "^5.32.2",

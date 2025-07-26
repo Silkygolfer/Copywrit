@@ -13,13 +13,20 @@ export const searchSupermemoryTool: Tool = {
     }),
     execute: async (args: { query: string }) => {
         console.log("Searching Supermemory for:", args.query)
-        const results = await supermemory.search.execute({
-            q: args.query,
-            containerTags: ["businessId"],
-        })
-        console.log("Supermemory results:", results)
-        return {
-            content: results.results.map((result) => result.chunks.map((chunk) => chunk.content).join("\n")).join("\n"),
+        try {
+            const results = await supermemory.search.execute({
+                q: args.query,
+                limit: 10,
+            })
+            
+            return {
+                content: results.results.map((result: any) => result.chunks.map((chunk: any) => chunk.content).join("\n")).join("\n"),
+            }
+        } catch (error) {
+            console.error("Error searching Supermemory:", error)
+            return {
+                content: "Error searching Supermemory",
+            }
         }
     }
 }

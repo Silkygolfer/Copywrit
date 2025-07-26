@@ -11,6 +11,8 @@
 import type * as businesses from "../businesses.js";
 import type * as chunks from "../chunks.js";
 import type * as clerk from "../clerk.js";
+import type * as custom_functions_custom_thread_mutation from "../custom_functions/custom_thread_mutation.js";
+import type * as custom_functions_triggers from "../custom_functions/triggers.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as lib_file_constants from "../lib/file_constants.js";
@@ -39,6 +41,8 @@ declare const fullApi: ApiFromModules<{
   businesses: typeof businesses;
   chunks: typeof chunks;
   clerk: typeof clerk;
+  "custom_functions/custom_thread_mutation": typeof custom_functions_custom_thread_mutation;
+  "custom_functions/triggers": typeof custom_functions_triggers;
   files: typeof files;
   http: typeof http;
   "lib/file_constants": typeof lib_file_constants;

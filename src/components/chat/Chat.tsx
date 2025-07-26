@@ -41,7 +41,6 @@ export default function Chat({ threadId }: ChatProps) {
   const handleSendMessage = useCallback(async (message: UIMessage) => {
 
     if (!threadId || !user) {
-      console.log("Early return: missing threadId or user");
       return;
     }
 

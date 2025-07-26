@@ -3,6 +3,7 @@ import { ConvexHttpClient } from "convex/browser";
 import { auth } from '@clerk/nextjs/server';
 import { streamText, UIMessage } from 'ai';
 import { google } from '@ai-sdk/google'
+import { anthropic } from '@ai-sdk/anthropic'
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
 import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     
     // 4. Trigger streamText function
     const result = streamText({
-      model: google('gemini-1.5-flash'),
+      model: anthropic('claude-3-5-haiku-latest'),
       messages: messages,
       system: systemPrompt,
       tools: copywritToolSet,
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
         });
       }
     })
+
 
     // 5. Return the streaming response
     return result.toTextStreamResponse()

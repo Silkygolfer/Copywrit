@@ -7,13 +7,15 @@ import equal from 'fast-deep-equal'
 import { Preloaded, usePreloadedQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import { Doc } from '../../../../convex/_generated/dataModel'
-import { Ellipsis } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThreadMenu } from './thread-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
+import { useMutation } from 'convex/react';
+import { toast } from 'sonner'
+import { deleteThread } from '../../../../convex/threads'
 
 interface ChatSidebarProps {
     threads: Preloaded<typeof api.threads.listThreads>
@@ -21,7 +23,6 @@ interface ChatSidebarProps {
 
 const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
     // state
-    const [openMenuThreadId, setOpenMenuThreadId] = useState<string | null>(null);
     const [showRenameDialog, setShowRenameDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [currentThread, setCurrentThread] = useState<Doc<'threads'> | null>(null);
@@ -104,6 +105,7 @@ interface RenameDialogProps {
 export function RenameDialog({ open, onOpenChange, thread }: RenameDialogProps) {
   const [value, setValue] = useState(thread?.title || '');
   const [isLoading, setIsLoading] = useState(false);
+  const renameThread = useMutation(api.threads.updateThreadTitle);
 
   useEffect(() => {
     if (open && thread) setValue(thread.title);
@@ -111,11 +113,19 @@ export function RenameDialog({ open, onOpenChange, thread }: RenameDialogProps) 
 
   const handleRename = async () => {
     setIsLoading(true);
-    // TODO: Implement mutation call to rename thread here
-    setTimeout(() => {
+    if (!thread) return;
+    const result = await renameThread({
+      threadId: thread._id,
+      title: value,
+    });
+    if (result.success) {
+      toast.success('Thread renamed successfully');
       setIsLoading(false);
       onOpenChange(false);
-    }, 1000);
+    } else {
+      toast.error('Failed to rename thread');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -127,13 +137,18 @@ export function RenameDialog({ open, onOpenChange, thread }: RenameDialogProps) 
         <Input
           value={value}
           onChange={e => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !isLoading && value.trim()) {
+              handleRename();
+            }
+          }}
           placeholder="Enter thread name"
           autoFocus
           disabled={isLoading}
         />
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>Cancel</Button>
-          <Button onClick={handleRename} disabled={isLoading || !value.trim()}>
+          <Button type="submit" onClick={handleRename} disabled={isLoading || !value.trim()}>
             {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />Renaming...</>) : 'Rename'}
           </Button>
         </DialogFooter>
@@ -150,14 +165,23 @@ interface DeleteDialogProps {
 
 export function DeleteDialog({ open, onOpenChange, thread }: DeleteDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const deleteThread = useMutation(api.threads.deleteThread);
+
 
   const handleDelete = async () => {
     setIsLoading(true);
-    // TODO: Implement mutation call to delete thread here
-    setTimeout(() => {
+    if (!thread) return;
+    const result = await deleteThread({
+      threadId: thread._id,
+    });
+    if (result.success) {
+      toast.success('Thread deleted successfully');
       setIsLoading(false);
       onOpenChange(false);
-    }, 1000);
+    } else {
+      toast.error('Failed to delete thread');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -171,9 +195,9 @@ export function DeleteDialog({ open, onOpenChange, thread }: DeleteDialogProps) 
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isLoading}>
+          <Button onClick={handleDelete} variant="destructive" className='bg-destructive text-destructive-foreground hover:bg-destructive/90' disabled={isLoading}>
             {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />Deleting...</>) : 'Delete'}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -1,18 +1,19 @@
 'use client'
 import { createContext, useContext, useState, useMemo } from "react";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
-import { api } from "../../../convex/_generated/api";
 
 const BusinessContext = createContext<{
     businessId: Id<"businesses">
     setBusinessId: (businessId: Id<"businesses">) => void
     businesses: Doc<"businesses">[]
     setBusinesses: (businesses: Doc<"businesses">[]) => void
+    selectedBusiness: Doc<"businesses"> | null
 }>({
     businessId: "" as Id<"businesses">,
     setBusinessId: () => {},
     businesses: [],
-    setBusinesses: () => {}
+    setBusinesses: () => {},
+    selectedBusiness: null
 })
 
 export const useBusinessContext = () => {
@@ -23,6 +24,17 @@ export const useBusinessContext = () => {
     return context
 }
 
+export const useBusiness = () => {
+    const { selectedBusiness, businessId, setBusinessId, businesses } = useBusinessContext()
+    
+    return {
+        business: selectedBusiness,
+        businessId,
+        setBusinessId,
+        businesses,
+    }
+}
+
 interface BusinessProviderProps {
     children: React.ReactNode
     initialBusinesses: Doc<"businesses">[]
@@ -30,7 +42,6 @@ interface BusinessProviderProps {
 
 export const BusinessProvider = ({ children, initialBusinesses }: BusinessProviderProps) => {
 
-    // Ensure there's at least one business
     if (!initialBusinesses || initialBusinesses.length === 0) {
         return <div>No businesses found. Please create a business first.</div>
     }
@@ -38,12 +49,17 @@ export const BusinessProvider = ({ children, initialBusinesses }: BusinessProvid
     const [businessId, setBusinessId] = useState<Id<"businesses">>(initialBusinesses[0]._id)
     const [businesses, setBusinesses] = useState<Doc<"businesses">[]>(initialBusinesses)
 
+    const selectedBusiness = useMemo(() => {
+        return businesses.find(business => business._id === businessId) || null
+    }, [businesses, businessId])
+
     const contextValue = useMemo(() => ({
         businessId,
         setBusinessId,
         businesses,
-        setBusinesses
-    }), [businessId, businesses])
+        setBusinesses,
+        selectedBusiness
+    }), [businessId, businesses, selectedBusiness])
 
     return (
         <BusinessContext.Provider value={contextValue}>

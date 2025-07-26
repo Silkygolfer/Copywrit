@@ -1,7 +1,2 @@
-import { useState } from "react";
-
-export const useBusiness = (initialBusinessId: string) => {
-  const [businessId, setBusinessId] = useState(initialBusinessId);
-
-  return { businessId, setBusinessId };
-};
+// Re-export the useBusiness hook from the business provider
+export { useBusiness } from "@/app/providers/business-provider" 

@@ -6,17 +6,15 @@ import ContextUploadButton from "./context-upload-button"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { ViewContextModal } from "./view-context-modal"
 import { useState } from "react"
+import { useBusiness } from "@/hooks/use-business"
 
-interface ContextActionsDropdownProps {
-    businessId: string;
-    businessName: string;
-}
+export const ContextActionsDropdown = () => {
 
-export const ContextActionsDropdown = ({ businessId, businessName }: ContextActionsDropdownProps) => {
+    const { business } = useBusiness();
 
     const { openFilePicker, isUploading } = useFileUpload({ 
-        businessId: businessId, 
-        businessName: businessName 
+        businessId: business?._id || "", 
+        businessName: business?.businessName || "" 
     });
 
     const [isOpenContextModal, setOpenContextModal] = useState(false);

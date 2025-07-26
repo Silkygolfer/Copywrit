@@ -4,7 +4,7 @@ import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { Id } from "./_generated/dataModel";
 import { api } from "./_generated/api";
-
+import { threadMutation } from "./custom_functions/custom_thread_mutation";
 
 export const listThreads = query({
   args: {
@@ -46,10 +46,41 @@ export const updateThreadTitle = mutation({
     title: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.threadId, {
-      title: args.title,
-    });
+    try {
+      const thread = await ctx.db.get(args.threadId);
+      if (!thread) {
+        return { success: false };
+      }
+      await ctx.db.patch(args.threadId, {
+        title: args.title,
+      });
+      return { success: true };
+    } catch (e) {
+      return { success: false };
+    }
   },
+  returns: { success: v.boolean() }
+});
+
+export const deleteThread = threadMutation({
+  args: {
+    threadId: v.id("threads"),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const thread = await ctx.db.get(args.threadId);
+      if (!thread) {
+        return { success: false };
+      }
+      
+      // Delete the thread - this will trigger the cleanup of related data
+      await ctx.db.delete(args.threadId);
+      return { success: true };
+    } catch (e) {
+      return { success: false };
+    }
+  },
+  returns: { success: v.boolean() }
 });
 
 export const createThreadAction = action({
@@ -102,3 +133,5 @@ export const getThread = query({
       .first();
   },
 });
+
+
