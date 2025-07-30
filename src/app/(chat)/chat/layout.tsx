@@ -16,15 +16,15 @@ export default async function ChatLayout({ children }: { children: ReactNode }) 
     if (!userId) {
         return <div>User not found</div>
     }
+
     const businesses = await fetchQuery(api.businesses.getBusinessByClerkUserId, { clerkUserId: userId })
-    const threads = await preloadQuery(api.threads.listThreads, { businessId: businesses[0]?._id || undefined })
 
     return (
     <Suspense fallback={<div>Loading...</div>}>
         <BusinessProvider initialBusinesses={businesses}>
             <SidebarProvider>
                 <div className="flex h-screen w-full">
-                    <ChatSidebar threads={threads}/>
+                    <ChatSidebar />
                     <SidebarInset>
                         <ChatHeader />
                         <div className="flex-1 overflow-hidden">

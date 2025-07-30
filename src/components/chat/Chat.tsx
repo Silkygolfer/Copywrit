@@ -9,7 +9,7 @@ import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
 import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
 import { v4 as uuidv4 } from 'uuid';
-import { useBusinessContext } from '@/app/providers/business-provider';
+import { useBusiness } from '@/app/providers/business-provider';
 
 interface ChatProps {
   threadId: Id<"threads"> | null;
@@ -20,7 +20,7 @@ export default function Chat({ threadId }: ChatProps) {
   const { user, isLoaded } = useUser();
 
   // Business
-  const { businessId } = useBusinessContext();
+  const { businessId } = useBusiness();
 
   // Queries
   const dbmessages = useQuery(api.messages.listMessages, threadId ? { threadId } : "skip");

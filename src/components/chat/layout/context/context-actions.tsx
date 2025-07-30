@@ -5,16 +5,16 @@ import { MoreVertical, Files } from "lucide-react"
 import ContextUploadButton from "./context-upload-button"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { ViewContextModal } from "./view-context-modal"
-import { useState } from "react"
-import { useBusiness } from "@/hooks/use-business"
+import { useState, useMemo } from "react"
+import { useBusiness } from "@/app/providers/business-provider"
 
 export const ContextActionsDropdown = () => {
 
-    const { business } = useBusiness();
+    const { businessId } = useBusiness();
 
     const { openFilePicker, isUploading } = useFileUpload({ 
-        businessId: business?._id || "", 
-        businessName: business?.businessName || "" 
+        businessId: businessId || "",
+        businessName: "temp"
     });
 
     const [isOpenContextModal, setOpenContextModal] = useState(false);

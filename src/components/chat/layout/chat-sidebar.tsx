@@ -3,31 +3,29 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarGroup, Si
 import Link from 'next/link'
 import LogOutButton from '../log-out-button'
 import { memo, useState, useEffect } from 'react'
-import equal from 'fast-deep-equal'
-import { Preloaded, usePreloadedQuery } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import { Doc } from '../../../../convex/_generated/dataModel'
 import { Button } from '@/components/ui/button'
 import { ThreadMenu } from './thread-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { useMutation } from 'convex/react';
 import { toast } from 'sonner'
-import { deleteThread } from '../../../../convex/threads'
+import { useBusiness } from '@/app/providers/business-provider'
 
-interface ChatSidebarProps {
-    threads: Preloaded<typeof api.threads.listThreads>
-}
-
-const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
+export const ChatSidebar = memo(() => {
     // state
     const [showRenameDialog, setShowRenameDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [currentThread, setCurrentThread] = useState<Doc<'threads'> | null>(null);
 
-    const threadsData = usePreloadedQuery(threads);
+    const { businessId } = useBusiness();
+
+    const threadsData = useQuery(api.threads.listThreads, businessId ? { businessId } : "skip");
+    
     return (
         <Sidebar>
             <SidebarHeader>
@@ -87,12 +85,7 @@ const PureChatSidebar = memo(({ threads }: ChatSidebarProps) => {
             <DeleteDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog} thread={currentThread} />
         </Sidebar>
     )
-}, (prevProps, nextProps) => {
-    // Only re-render if threads actually changed (using deep comparison)
-    return equal(prevProps.threads, nextProps.threads);
 });
-
-PureChatSidebar.displayName = 'PureChatSidebar';
 
 // --- Dialog Components ---
 
@@ -194,7 +187,7 @@ export function DeleteDialog({ open, onOpenChange, thread }: DeleteDialogProps) 
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <Button onClick={() => onOpenChange(false)} variant="outline" disabled={isLoading}>Cancel</Button>
           <Button onClick={handleDelete} variant="destructive" className='bg-destructive text-destructive-foreground hover:bg-destructive/90' disabled={isLoading}>
             {isLoading ? (<><Loader2 className="h-4 w-4 animate-spin" />Deleting...</>) : 'Delete'}
           </Button>
@@ -203,14 +196,4 @@ export function DeleteDialog({ open, onOpenChange, thread }: DeleteDialogProps) 
     </AlertDialog>
   );
 }
-
-// Container component that handles the hooks
-export const ChatSidebar = ({ threads }: { threads: Preloaded<typeof api.threads.listThreads> }) => {
-    
-    return (
-        <PureChatSidebar 
-            threads={threads}
-        />
-    );
-};
 
