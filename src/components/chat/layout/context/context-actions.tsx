@@ -1,11 +1,10 @@
 'use client'
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Files } from "lucide-react"
-import ContextUploadButton from "./context-upload-button"
+import { MoreVertical, Files, Loader2, Upload } from "lucide-react"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { ViewContextModal } from "./view-context-modal"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { useBusiness } from "@/app/providers/business-provider"
 
 export const ContextActionsDropdown = () => {
@@ -13,8 +12,7 @@ export const ContextActionsDropdown = () => {
     const { businessId } = useBusiness();
 
     const { openFilePicker, isUploading } = useFileUpload({ 
-        businessId: businessId || "",
-        businessName: "temp"
+        businessId: businessId,
     });
 
     const [isOpenContextModal, setOpenContextModal] = useState(false);
@@ -31,7 +29,12 @@ export const ContextActionsDropdown = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
                     <DropdownMenuItem onClick={openFilePicker} disabled={isUploading}>
-                        <ContextUploadButton openFilePicker={openFilePicker} isUploading={isUploading} />
+                        {isUploading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Upload className="h-4 w-4" />
+                        )}
+                        <span>{isUploading ? 'Uploading...' : 'Add Context'}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setOpenContextModal(true)}>
                         <Files className="w-4 h-4 mr-2" />

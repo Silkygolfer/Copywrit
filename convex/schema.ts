@@ -55,7 +55,6 @@ export default defineSchema({
     fileSize: v.number(),
     uploadedAt: v.number(),
     businessId: v.id("businesses"),
-    businessName: v.string(),
     clerkUserId: v.string(),
     supermemoryId: v.string(),
   }).index("by_business", ["businessId"])

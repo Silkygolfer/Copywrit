@@ -30,32 +30,18 @@ interface BusinessProviderProps {
 }
 
 export const BusinessProvider = ({ children, initialBusinesses }: BusinessProviderProps) => {
-    console.log('BusinessProvider render', { initialBusinesses: initialBusinesses?.length });
     
     // Always call hooks first, before any conditional logic
-    const [businessId, setBusinessIdState] = useState<Id<"businesses">>(
+    const [businessId, setBusinessId] = useState<Id<"businesses">>(
         initialBusinesses?.[0]?._id || "" as Id<"businesses">
     )
-    // Use a ref to store the initial businesses and only update if they actually change
-    const [businesses, setBusinessesState] = useState<Doc<"businesses">[]>(() => initialBusinesses || [])
-
-    const setBusinessId = useCallback((newId: Id<"businesses">) => {
-        console.log('setBusinessId called', { to: newId });
-        setBusinessIdState(newId);
-    }, []);
-
-    const setBusinesses = useCallback((newBusinesses: Doc<"businesses">[]) => {
-        console.log('setBusinesses called', { length: newBusinesses.length });
-        setBusinessesState(newBusinesses);
-    }, []);
+    const [businesses, setBusinesses] = useState<Doc<"businesses">[]>(initialBusinesses || [])
 
     const selectedBusiness = useMemo(() => {
-        console.log('selectedBusiness recalculated', { businessId, businessesLength: businesses.length, businessesRef: businesses });
         return businesses.find(business => business._id === businessId) || null
     }, [businesses, businessId])
 
     const contextValue = useMemo(() => {
-        console.log('BusinessContext value recreated', { businessId, businessesLength: businesses.length, businessesRef: businesses });
         return {
             businessId,
             setBusinessId,
@@ -63,7 +49,7 @@ export const BusinessProvider = ({ children, initialBusinesses }: BusinessProvid
             setBusinesses,
             selectedBusiness
         };
-    }, [businessId, setBusinessId, businesses, setBusinesses, selectedBusiness])
+    }, [businessId, businesses, selectedBusiness])
 
     return (
         <BusinessContext.Provider value={contextValue}>
