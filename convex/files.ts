@@ -4,7 +4,6 @@ import { api, components } from "./_generated/api";
 import { MAX_FILE_SIZE, isSupportedFile, estimateTokenCount, MAX_TOKENS_PER_FILE, getFileTypeInfo, getCorrectMimeType } from "./lib/file_constants";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
-import { randomUUID } from "crypto";
 import supermemory from "./lib/supermemory";
 
 export const r2 = new R2(components.r2);
