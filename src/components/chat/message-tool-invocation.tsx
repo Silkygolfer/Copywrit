@@ -7,7 +7,7 @@ const toolNames = {
     getMemory: 'Searching memory...',
 }
 
-function PureMessageToolInvocation({ toolInvocation, id }: { toolInvocation: ToolInvocation, id: string }) {
+function PureMessageToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocation }) {
     const { toolName, args } = toolInvocation;
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -37,7 +37,6 @@ function PureMessageToolInvocation({ toolInvocation, id }: { toolInvocation: Too
 
 const MessageToolInvocation = memo(PureMessageToolInvocation, (prev, next) => {
     return (
-        prev.id === next.id &&
         prev.toolInvocation.toolName === next.toolInvocation.toolName &&
         JSON.stringify(prev.toolInvocation.args) === JSON.stringify(next.toolInvocation.args)
     );

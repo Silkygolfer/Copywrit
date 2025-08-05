@@ -59,7 +59,6 @@ function PureMessages({
               message={message}
               threadId={threadId}
               registerRef={registerRef}
-              sentMessageIds={sentMessageIds}
             />
           );
         })}

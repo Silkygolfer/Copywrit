@@ -172,7 +172,7 @@ function ChatInput({
                 {isLoading ? (
                   <StopButton />
                 ) : (
-                  <SendButton onSubmit={handleSubmit} disabled={isDisabled} />
+                  <MemoizedSendButton onSubmit={handleSubmit} disabled={isDisabled} />
                 )}
               </div>
             </div>
@@ -196,7 +196,7 @@ function StopButton() {
   );
 }
 
-const SendButton = memo(({ onSubmit, disabled }: SendButtonProps) => {
+const MemoizedSendButton = memo(({ onSubmit, disabled }: SendButtonProps) => {
   return (
     <Button
       onClick={onSubmit}
@@ -211,10 +211,16 @@ const SendButton = memo(({ onSubmit, disabled }: SendButtonProps) => {
   );
 }, (prevProps, nextProps) => prevProps.disabled === nextProps.disabled);
 
+MemoizedSendButton.displayName = 'SendButton';
 
-export default memo(ChatInput, (prevProps, nextProps) => {
+
+const MemoizedChatInput = memo(ChatInput, (prevProps, nextProps) => {
     if (prevProps.isLoading !== nextProps.isLoading) return false;
     if (prevProps.threadId !== nextProps.threadId) return false;
     if (prevProps.onSendMessage !== nextProps.onSendMessage) return false;
     return true;
 });
+
+MemoizedChatInput.displayName = 'ChatInput';
+
+export default MemoizedChatInput;

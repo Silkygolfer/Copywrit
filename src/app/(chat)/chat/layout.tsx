@@ -1,9 +1,9 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { ChatSidebar } from "@/components/chat/layout/chat-sidebar";
+import MemoizedChatSidebar from "@/components/chat/layout/chat-sidebar";
 import { ChatHeader } from "@/components/chat/layout/chat-header";
 import { ReactNode, Suspense } from 'react';
 import { BusinessProvider } from "@/app/providers/business-provider";
-import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 
@@ -24,7 +24,7 @@ export default async function ChatLayout({ children }: { children: ReactNode }) 
         <BusinessProvider initialBusinesses={businesses}>
             <SidebarProvider>
                 <div className="flex h-screen w-full">
-                    <ChatSidebar />
+                    <MemoizedChatSidebar />
                     <SidebarInset>
                         <ChatHeader />
                         <div className="flex-1 overflow-hidden">

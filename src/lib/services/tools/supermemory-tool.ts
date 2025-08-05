@@ -22,7 +22,7 @@ export const searchSupermemoryTool: Tool = {
             })
             
             return {
-                content: results.results.map((result: any) => result.chunks.map((chunk: any) => chunk.content).join("\n")).join("\n"),
+                content: results.results.map((result: { chunks: { content: string }[] }) => result.chunks.map((chunk) => chunk.content).join("\n")).join("\n"),
             }
         } catch (error) {
             console.error("Error searching Supermemory:", error)

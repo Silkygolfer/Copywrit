@@ -113,7 +113,7 @@ export const ViewContextModal = ({
         );
       },
     },
-  ], []);
+  ], [deleteFile]);
 
   const table = useReactTable({
     data: stableData ?? fallbackData,

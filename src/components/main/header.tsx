@@ -1,4 +1,4 @@
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/components/ui/navigation-menu"
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem } from "@/components/ui/navigation-menu"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 

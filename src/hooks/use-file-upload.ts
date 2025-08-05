@@ -39,7 +39,6 @@ export const useFileUpload = ({ businessId }: UseFileUploadProps) => {
       }
       
       const data = await response.json();
-      console.log(data);
       toast.success('File uploaded successfully!');
       return data;
     } catch (error) {
@@ -49,7 +48,7 @@ export const useFileUpload = ({ businessId }: UseFileUploadProps) => {
     } finally {
       setIsUploading(false);
     }
-  }, [businessId]);
+  }, [businessId, getToken]);
 
   const openFilePicker = useCallback(() => {
     const input = document.createElement('input'); 

@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useState, useMemo, useCallback } from "react";
+import { createContext, useContext, useState, useMemo } from "react";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
 
 const BusinessContext = createContext<{

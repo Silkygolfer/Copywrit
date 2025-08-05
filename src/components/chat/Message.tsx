@@ -3,23 +3,20 @@ import { memo } from 'react';
 import SimpleMarkdown from './simple-markdown';
 import { cn } from '@/lib/utils/tw-utils';
 import equal from 'fast-deep-equal';
-import MessageControls from './message-controls';
+import MemoizedMessageControls from './message-controls';
 import MessageReasoning from './message-reasoning';
 import { MessageToolInvocation } from './message-tool-invocation';
 import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
 
 function PureMessage({
-  threadId,
   message,
   registerRef,
-  sentMessageIds,
 }: {
   threadId: Id<"threads">;
   message: UIMessage & { streamId: Id<'streams'> };
   registerRef: (id: string, ref: HTMLDivElement | null) => void;
-  sentMessageIds: Set<string>;
-}) {
+}) {  
   return (
     <div
       role="article"
@@ -37,7 +34,6 @@ function PureMessage({
             <MessageReasoning
               key={key}
               reasoning={part.reasoning}
-              id={message.id}
             />
           );
         }
@@ -47,7 +43,6 @@ function PureMessage({
             <MessageToolInvocation
               key={key}
               toolInvocation={part.toolInvocation}
-              id={message.id}
             />
           );
         }
@@ -63,8 +58,7 @@ function PureMessage({
                 <div className="mb-2">
                   {part.text}
                 </div>
-                <MessageControls
-                  threadId={threadId}
+                <MemoizedMessageControls
                   content={part.text}
                   message={message}
                 />
@@ -77,8 +71,7 @@ function PureMessage({
                 <div className="bg-transparent text-copywrit-cream rounded-2xl p-5 max-w-[85%]">
                   <SimpleMarkdown content={part.text} />
                 </div>
-                <MessageControls
-                  threadId={threadId}
+                <MemoizedMessageControls
                   content={part.text}
                   message={message}
                 />
@@ -94,7 +87,6 @@ function PureMessage({
 const PreviewMessage = memo(PureMessage, (prevProps, nextProps) => {
   if (prevProps.message.id !== nextProps.message.id) return false;
   if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
-  if (prevProps.sentMessageIds.has(prevProps.message.id) !== nextProps.sentMessageIds.has(nextProps.message.id)) return false;
   return true;
 });
 

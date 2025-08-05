@@ -11,7 +11,7 @@ import { RenameDialog } from './rename-dialog'
 import { DeleteDialog } from './delete-dialog'
 import { useBusiness } from '@/app/providers/business-provider'
 
-export const ChatSidebar = memo(() => {
+export const MemoizedChatSidebar = memo(() => {
     // state
     const [showRenameDialog, setShowRenameDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -82,3 +82,6 @@ export const ChatSidebar = memo(() => {
     )
 });
 
+MemoizedChatSidebar.displayName = 'ChatSidebar';
+
+export default MemoizedChatSidebar;

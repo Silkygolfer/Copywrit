@@ -1,8 +1,7 @@
 import { NextRequest } from 'next/server';
 import { ConvexHttpClient } from "convex/browser";
 import { auth } from '@clerk/nextjs/server';
-import { streamText, UIMessage } from 'ai';
-import { google } from '@ai-sdk/google'
+import { streamText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic'
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
@@ -88,6 +87,8 @@ export async function POST(req: NextRequest) {
       onFinish: async (message) => {
         // Flush any remaining buffer and update status to "done"
         await streamProcessor.flush();
+        
+        console.log("message", message);
 
         await convex.mutation(api.messages.addMessage, {
           messageId: assistantMessageId,
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
 
 
     // 5. Return the streaming response
-    return result.toTextStreamResponse()
+    return result.toDataStreamResponse()
     
   } catch (error) {
     console.error('Chat API error:', error);

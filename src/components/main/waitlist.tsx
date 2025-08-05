@@ -1,5 +1,4 @@
 "use client"
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,7 +17,7 @@ export default function Waitlist() {
 
     const waitlistCount = useQuery(api.waitlist.count);
 
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
+    const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
         mode: "onSubmit"
     })
@@ -34,9 +33,9 @@ export default function Waitlist() {
             if (error) {
                 toast.error(error || "Failed to join waitlist");
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to join waitlist:", error);
-            toast.error(error.message || "Failed to join waitlist");
+            toast.error((error as Error).message || "Failed to join waitlist");
         }
     }
 

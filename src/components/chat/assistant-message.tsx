@@ -21,6 +21,7 @@ export default function OptimisticAssistantMessage({
   sentMessageIds,
   onStreamUpdate,
 }: OptimisticAssistantMessageProps) {
+  
   const { text, status } = useChat({
     businessId: businessId,
     threadId: threadId,

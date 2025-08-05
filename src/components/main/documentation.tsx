@@ -46,7 +46,7 @@ export default function Documentation() {
                         <div className="bg-gray-800 p-2 rounded text-gray-200">
                         <span className="text-purple-600">import</span> {`{ initialize }`}{" "}
                         <span className="text-purple-600">from</span>{" "}
-                        <span className="text-green-600">'@company/package'</span>;
+                        <span className="text-green-600">`@company/package`</span>;
                         <br />
                         <br />
                         initialize({`{ apiKey: 'YOUR_API_KEY' }`});
