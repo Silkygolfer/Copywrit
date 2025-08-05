@@ -28,7 +28,7 @@ export const useChat = ({
       return true;
     }
     return false;
-  }, [isDriving, streamId, streamEnded]);
+  }, [isDriving, streamEnded]);
 
   const persistentText = useQuery(
     api.chunks.getStreamText,
@@ -49,7 +49,7 @@ export const useChat = ({
         streamStarted.current = true;
       }
     }
-  }, [isDriving, streamId]);
+  }, [isDriving, streamId, threadId, businessId]);
 
 
   const body = useMemo(() => {
@@ -97,7 +97,8 @@ async function startStream(
   while (true) {
     try {
       const { done, value } = await reader.read();
-      const decodedText = new TextDecoder().decode(value, { stream: true });      
+      const decodedText = new TextDecoder().decode(value, { stream: true });
+      console.log("decodedText", decodedText);
       if (done) {
         onUpdate(decodedText);
         return true;

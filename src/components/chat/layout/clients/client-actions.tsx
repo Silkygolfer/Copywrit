@@ -16,13 +16,11 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils/tw-utils";
 import { Id } from "../../../../../convex/_generated/dataModel";
-import { useBusiness } from "@/hooks/use-business";
+import { useBusiness } from "@/app/providers/business-provider";
 
 export const ClientActionsDropdown = () => {
-  const { businesses } = useBusiness();
+  const { businesses, businessId, setBusinessId } = useBusiness();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<Id<"businesses"> | null>(null);
-  const { setBusinessId } = useBusiness();
 
   return (
     <Popover 
@@ -37,7 +35,7 @@ export const ClientActionsDropdown = () => {
         >
           <span>
             {businesses
-              ? businesses.find((business) => business._id === value)?.businessName
+              ? businesses.find((business) => business._id === businessId)?.businessName
               : "Select Client"}
           </span>
           <ChevronDown className="w-4 h-4" />
@@ -53,15 +51,15 @@ export const ClientActionsDropdown = () => {
                 key={business._id}
                 value={business._id}
                 onSelect={(currentId: string) => {
-                  setBusinessId(currentId as Id<"businesses">);
-                  setValue(currentId === value ? null : currentId as Id<"businesses">);
+                  const newBusinessId = currentId as Id<"businesses">;
+                  setBusinessId(newBusinessId);
                   setOpen(false);
                 }}
               >
                 <CheckIcon
                   className={cn(
                     "w-4 h-4",
-                    value === business._id ? "opacity-100" : "opacity-0"
+                    businessId === business._id ? "opacity-100" : "opacity-0"
                   )}
                 />
                 {business.businessName}

@@ -1,6 +1,6 @@
 'use client'
 import Messages from './messages';
-import ChatInput from './chat-input';
+import MemoizedChatInput from './chat-input';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -9,7 +9,7 @@ import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
 import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
 import { v4 as uuidv4 } from 'uuid';
-import { useBusinessContext } from '@/app/providers/business-provider';
+import { useBusiness } from '@/app/providers/business-provider';
 
 interface ChatProps {
   threadId: Id<"threads"> | null;
@@ -20,7 +20,7 @@ export default function Chat({ threadId }: ChatProps) {
   const { user, isLoaded } = useUser();
 
   // Business
-  const { businessId } = useBusinessContext();
+  const { businessId } = useBusiness();
 
   // Queries
   const dbmessages = useQuery(api.messages.listMessages, threadId ? { threadId } : "skip");
@@ -78,7 +78,7 @@ export default function Chat({ threadId }: ChatProps) {
         console.error('Failed to send initial message:', error);
       }
     }
-  }, [threadId]); // Dependencies ensure this runs when threadId or user changes
+  }, [threadId, handleSendMessage]); // Dependencies ensure this runs when threadId or user changes
 
   return (
     <div className="relative w-full h-full flex flex-col">
@@ -99,7 +99,7 @@ export default function Chat({ threadId }: ChatProps) {
       </div>
 
       <div className="flex-shrink-0">
-        <ChatInput
+        <MemoizedChatInput
           threadId={threadId}
           onSendMessage={handleSendMessage}
           isLoading={!isLoaded}

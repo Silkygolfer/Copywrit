@@ -9,7 +9,7 @@ export default function Pricing() {
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Simple, transparent pricing</h2>
                 <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                  Choose the plan that's right for you and start improving your workflow today.
+                  Choose the plan that&apos;s right for you and start improving your workflow today.
                 </p>
               </div>
 

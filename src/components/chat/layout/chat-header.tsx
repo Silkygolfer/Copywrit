@@ -1,7 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ClientActionsDropdown } from "@/components/chat/layout/clients/client-actions";
 import { ContextActionsDropdown } from "@/components/chat/layout/context/context-actions";
-import { useBusiness } from "@/hooks/use-business";
 
 
 export const ChatHeader = () => {

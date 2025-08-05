@@ -5,10 +5,8 @@ import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 function PureMessageReasoning({
   reasoning,
-  id,
 }: {
   reasoning: string;
-  id: string;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -42,5 +40,5 @@ function PureMessageReasoning({
 }
 
 export default memo(PureMessageReasoning, (prev, next) => {
-  return prev.reasoning === next.reasoning && prev.id === next.id;
+  return prev.reasoning === next.reasoning;
 });

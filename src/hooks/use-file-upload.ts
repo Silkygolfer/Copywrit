@@ -4,10 +4,9 @@ import { useAuth } from '@clerk/nextjs';
 
 interface UseFileUploadProps {
   businessId: string;
-  businessName: string;
 }
 
-export const useFileUpload = ({ businessId, businessName }: UseFileUploadProps) => {
+export const useFileUpload = ({ businessId }: UseFileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const { getToken } = useAuth();
 
@@ -20,7 +19,6 @@ export const useFileUpload = ({ businessId, businessName }: UseFileUploadProps) 
       formData.append('file', file);
       formData.append('fileName', file.name);
       formData.append('businessId', businessId);
-      formData.append('businessName', businessName);
 
       const token = await getToken({ template: "convex" });
 
@@ -41,7 +39,6 @@ export const useFileUpload = ({ businessId, businessName }: UseFileUploadProps) 
       }
       
       const data = await response.json();
-      
       toast.success('File uploaded successfully!');
       return data;
     } catch (error) {
@@ -51,7 +48,7 @@ export const useFileUpload = ({ businessId, businessName }: UseFileUploadProps) 
     } finally {
       setIsUploading(false);
     }
-  }, [businessId, businessName]);
+  }, [businessId, getToken]);
 
   const openFilePicker = useCallback(() => {
     const input = document.createElement('input'); 

@@ -39,7 +39,7 @@ export default function SocialProof() {
                   },
                 ].map((testimonial, i) => (
                   <div key={i} className="bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-600">
-                    <p className="text-gray-200 mb-4">"{testimonial.quote}"</p>
+                    <p className="text-gray-200 mb-4">&quot;{testimonial.quote}&quot;</p>
                     <div className="flex items-center gap-3">
                                               <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">

@@ -1,15 +1,15 @@
 "use client"
 
-import Link from "next/link"
-import Image from "next/image"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+// import Link from "next/link"
+// import Image from "next/image"
+// import {
+//   NavigationMenu,
+//   NavigationMenuItem,
+//   NavigationMenuLink,
+//   NavigationMenuList,
+// } from "@/components/ui/navigation-menu"
+// import { Button } from "@/components/ui/button"
+// import { Input } from "@/components/ui/input"
 import Header from "@/components/main/header"
 import Hero from "@/components/main/hero"
 import Waitlist from "@/components/main/waitlist"

@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UIMessage } from 'ai';
 import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
-import { useBusinessContext } from '@/app/providers/business-provider';
+import { useBusiness } from '@/app/providers/business-provider';
 
 interface ChatInputProps {
   threadId: Id<"threads"> | null;
@@ -26,8 +26,7 @@ interface SendButtonProps {
   disabled: boolean;
 }
 
-
-function PureChatInput({
+function ChatInput({
   threadId,
   onSendMessage,
   isLoading,
@@ -40,7 +39,7 @@ function PureChatInput({
 
   const router = useRouter();
   const {user} = useUser();
-  const {businessId} = useBusinessContext()
+  const {businessId} = useBusiness()
   const [input, setInput] = useState('');
 
   // Mutations
@@ -119,6 +118,8 @@ function PureChatInput({
     threadId,
     router,
     user,
+    businessId, 
+    createThreadAction
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -171,7 +172,7 @@ function PureChatInput({
                 {isLoading ? (
                   <StopButton />
                 ) : (
-                  <SendButton onSubmit={handleSubmit} disabled={isDisabled} />
+                  <MemoizedSendButton onSubmit={handleSubmit} disabled={isDisabled} />
                 )}
               </div>
             </div>
@@ -182,13 +183,7 @@ function PureChatInput({
   );
 }
 
-const ChatInput = memo(PureChatInput, (prevProps, nextProps) => {
-  if (prevProps.isLoading !== nextProps.isLoading) return false;
-  if (prevProps.threadId !== nextProps.threadId) return false;
-  return true;
-});
-
-function PureStopButton() {
+function StopButton() {
   return (
     <Button
       variant="outline"
@@ -201,9 +196,7 @@ function PureStopButton() {
   );
 }
 
-const StopButton = memo(PureStopButton);
-
-const PureSendButton = ({ onSubmit, disabled }: SendButtonProps) => {
+const MemoizedSendButton = memo(({ onSubmit, disabled }: SendButtonProps) => {
   return (
     <Button
       onClick={onSubmit}
@@ -216,10 +209,18 @@ const PureSendButton = ({ onSubmit, disabled }: SendButtonProps) => {
       <ArrowUpIcon size={18} />
     </Button>
   );
-};
+}, (prevProps, nextProps) => prevProps.disabled === nextProps.disabled);
 
-const SendButton = memo(PureSendButton, (prevProps, nextProps) => {
-  return prevProps.disabled === nextProps.disabled;
+MemoizedSendButton.displayName = 'SendButton';
+
+
+const MemoizedChatInput = memo(ChatInput, (prevProps, nextProps) => {
+    if (prevProps.isLoading !== nextProps.isLoading) return false;
+    if (prevProps.threadId !== nextProps.threadId) return false;
+    if (prevProps.onSendMessage !== nextProps.onSendMessage) return false;
+    return true;
 });
 
-export default ChatInput;
+MemoizedChatInput.displayName = 'ChatInput';
+
+export default MemoizedChatInput;

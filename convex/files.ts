@@ -38,7 +38,6 @@ export const uploadFile = httpAction(async (ctx, request) => {
         const formData = await request.formData()
         const file = formData.get("file") as Blob
         const businessId = formData.get("businessId") as string
-        const businessName = formData.get("businessName") as string
         const fileName = formData.get("fileName") as string
 
         if (!file) {
@@ -155,7 +154,7 @@ export const uploadFile = httpAction(async (ctx, request) => {
         }
 
         // Generate unique key for the file
-        const key = `attachments/${businessName}/${Date.now()}-${crypto.randomUUID()}-${fileName}`
+        const key = `attachments/${businessId}/${Date.now()}-${crypto.randomUUID()}-${fileName}`
 
         // Get the correct MIME type (handles browser inconsistencies)
         const mimeType = getCorrectMimeType(fileName, file.type)
@@ -200,7 +199,6 @@ export const uploadFile = httpAction(async (ctx, request) => {
             fileSize: file.size,
             uploadedAt: Date.now(),
             businessId: businessId as Id<"businesses">,
-            businessName: businessName,
             clerkUserId: user.subject,
             supermemoryId: res.id,
         }
@@ -250,8 +248,7 @@ export const createFile = mutation({
         fileType: v.string(),
         fileSize: v.number(),
         uploadedAt: v.number(),
-        businessId: v.id("businesses"),
-        businessName: v.string(),
+        businessId: v.id("businesses"), 
         clerkUserId: v.string(),
         supermemoryId: v.string(),
     },

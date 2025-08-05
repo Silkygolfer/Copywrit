@@ -1,22 +1,20 @@
 'use client'
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils/tw-utils';
 import { Check, Copy } from 'lucide-react';
-import { Id } from '../../../convex/_generated/dataModel';
+import { Id } from "../../../convex/_generated/dataModel"
 import { UIMessage } from 'ai';
 
 interface MessageControlsProps {
-  threadId: Id<"threads">;
   message: UIMessage & { streamId: Id<'streams'> };
   content: string;
 }
 
-export default function MessageControls({
-  threadId,
+export const MemoizedMessageControls = memo(({
   message,
   content,
-}: MessageControlsProps) {
+}: MessageControlsProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -42,4 +40,8 @@ export default function MessageControls({
       </Button>
     </div>
   );
-}
+});
+
+MemoizedMessageControls.displayName = 'MessageControls';
+
+export default MemoizedMessageControls;
