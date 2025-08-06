@@ -1,5 +1,5 @@
 'use client'
-import Messages from './messages';
+import Messages from './Messages';
 import MemoizedChatInput from './chat-input';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';

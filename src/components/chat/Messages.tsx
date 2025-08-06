@@ -4,7 +4,7 @@ import equal from 'fast-deep-equal';
 import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
 import OptimisticAssistantMessage from './assistant-message';
-import Message from './message';
+import Message from './Message';
 
 
 

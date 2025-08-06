@@ -13,6 +13,7 @@ import { auth } from "@clerk/nextjs/server";
 export default async function ChatLayout({ children }: { children: ReactNode }) {
 
     const { userId } =await auth()
+    
     if (!userId) {
         return <div>User not found</div>
     }
