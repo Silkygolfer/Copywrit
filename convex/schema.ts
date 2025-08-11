@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
+import { DBMessage } from "./lib/types";
 
 export const streamStatusValidator = v.union(
   v.literal("pending"),
@@ -74,22 +75,17 @@ export default defineSchema({
 
   // Chat messages table
   messages: defineTable({
-    messageId: v.string(),
+    // Core message fields from DBMessage
+    ...DBMessage.fields,
+    // Database-specific fields
     threadId: v.id('threads'),
     clerkUserId: v.optional(v.string()),
-    content: v.string(),
-    role: v.union(
-      v.literal("user"),
-      v.literal("assistant"),
-      v.literal("system"),
-      v.literal("data")
-    ),
-    parts: v.array(v.any()),
     createdAt: v.number(),
     streamId: v.id("streams"),
   })
     .index("by_thread", ["threadId"])
-    .index("by_thread_and_created", ["threadId", "createdAt"]),
+    .index("by_thread_and_created", ["threadId", "createdAt"])
+    .index("by_stream", ["streamId"]),
 
   // streams table
   streams: defineTable({

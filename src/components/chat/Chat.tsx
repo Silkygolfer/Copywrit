@@ -7,9 +7,10 @@ import { api } from '../../../convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 import { Id } from '../../../convex/_generated/dataModel';
 import { UIMessage } from 'ai';
-import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
+import { dbMessageToUIMessage } from '../../../convex/lib/message-converters';
 import { v4 as uuidv4 } from 'uuid';
 import { useBusiness } from '@/app/providers/business-provider';
+import { useChat } from '@ai-sdk/react';
 
 interface ChatProps {
   threadId: Id<"threads"> | null;
@@ -24,10 +25,6 @@ export default function Chat({ threadId }: ChatProps) {
 
   // Queries
   const dbmessages = useQuery(api.messages.listMessages, threadId ? { threadId } : "skip");
-  const messages: (UIMessage & { streamId: Id<'streams'> })[] = dbmessages?.map(convertDBMessageToUIMessage) || [];
-
-  // Mutations
-  const sendMessage = useMutation(api.messages.sendMessage);
 
   // Refs
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -38,6 +35,17 @@ export default function Chat({ threadId }: ChatProps) {
   // State - track sent message IDs instead of thread IDs
   const [sentMessageIds, setSentMessageIds] = useState<Set<string>>(new Set());
 
+  // Hooks
+  const { messages, sendMessage, status } = useChat({
+    transport: convexStreamTransport({
+      api, 
+    })
+    body: {
+      threadId,
+      businessId,
+    },
+  });
+
   const handleSendMessage = useCallback(async (message: UIMessage) => {
 
     if (!threadId || !user) {
@@ -47,13 +55,18 @@ export default function Chat({ threadId }: ChatProps) {
     try {
       // Generate a unique message ID
       const messageId = uuidv4();
+      
+      // Extract text content from parts for backward compatibility
+      const textPart = message.parts.find((part: any) => part.type === 'text') as any;
+      const content = textPart?.text || '';
+      
       // Create the message in the database
       await sendMessage({
-        messageId: messageId,
-        threadId: threadId,
-        content: message.content,
+        id: messageId,
         role: message.role,
         parts: message.parts,
+        metadata: message.metadata,
+        threadId: threadId,
         clerkUserId: user.id,
       });
 

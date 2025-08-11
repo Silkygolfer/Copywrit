@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { DBMessage } from "./lib/types";
 
 export const listMessages = query({
   args: { 
@@ -29,12 +30,11 @@ export const getMessageByStreamId = query({
 
 export const sendMessage = mutation({
   args: {
-    messageId: v.string(),
+    // DBMessage fields
+    ...DBMessage.fields,
+    // Database-specific fields
     threadId: v.id('threads'),
     clerkUserId: v.optional(v.string()),
-    content: v.string(),
-    role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system"), v.literal("data")),
-    parts: v.array(v.any())
   },
   handler: async (ctx, args) => {
     const streamId = await ctx.db.insert("streams", {
@@ -43,37 +43,37 @@ export const sendMessage = mutation({
     }) as Id<"streams">;
 
       await ctx.db.insert("messages", {
-        messageId: args.messageId,
+        id: args.id,
+        role: args.role,
+        metadata: args.metadata,
+        parts: args.parts,
         threadId: args.threadId,
         clerkUserId: args.clerkUserId,
-        content: args.content,
-        role: args.role,
-        parts: args.parts,
         streamId: streamId,
         createdAt: Date.now(),
       });
-      return args.messageId;
+      return args.id;
   },
 });
 
 export const addMessage = mutation({
   args: {
-    messageId: v.string(),
-    clerkUserId: v.optional(v.string()),
+    // DBMessage fields
+    ...DBMessage.fields,
+    // Database-specific fields
     threadId: v.id('threads'),
-    content: v.string(),
-    role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system"), v.literal("data")),
-    parts: v.array(v.any()),
+    clerkUserId: v.optional(v.string()),
     streamId: v.id('streams'),
     createdAt: v.number(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("messages", {
-      messageId: args.messageId,
-      threadId: args.threadId,
-      content: args.content,
+      id: args.id,
       role: args.role,
+      metadata: args.metadata,
       parts: args.parts,
+      threadId: args.threadId,
+      clerkUserId: args.clerkUserId,
       streamId: args.streamId,
       createdAt: args.createdAt,
     });

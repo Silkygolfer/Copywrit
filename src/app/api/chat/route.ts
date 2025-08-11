@@ -1,16 +1,16 @@
 import { NextRequest } from 'next/server';
 import { ConvexHttpClient } from "convex/browser";
 import { auth } from '@clerk/nextjs/server';
-import { streamText } from 'ai';
+import { smoothStream, streamText, convertToModelMessages } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic'
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
-import { convertDBMessageToUIMessage } from '@/lib/utils/convert-db-to-core-messages';
 import { StreamProcessor } from '@/lib/utils/stream-processor';
 import { v4 as uuidv4 } from 'uuid';
 import { copywritToolSet } from '@/lib/services/tools';
 import { SystemPromptBuilder } from '@/lib/utils/system-prompt-builder';
-
+import { markdownJoinerTransform } from '@/lib/helpers/markdown-render';
+import { dbMessageToUIMessage, uiMessageToDBMessage } from '../../../../convex/lib/message-converters';
 
 type ChatRequest = {
   threadId: Id<"threads">,
@@ -60,10 +60,10 @@ export async function POST(req: NextRequest) {
 
     // Get the message history from the thread + convert to UI messages
     const dbHistory = await convex.query(api.messages.listMessages, { threadId });
-    const history = dbHistory.map(convertDBMessageToUIMessage);
+    const history = dbHistory.map(dbMessageToUIMessage);
 
     // create a new message array with the history and the new message
-    const messages = [...history, convertDBMessageToUIMessage(message)];
+    const messages = [...history, dbMessageToUIMessage(message)];
 
     // Create a new messageId for assistant message
     const assistantMessageId = uuidv4();
@@ -74,37 +74,45 @@ export async function POST(req: NextRequest) {
     const systemPrompt = await systemPromptBuilder.buildSystemPrompt();
     
     // 4. Trigger streamText function
+
+    // convert UIMessages to ModelMessages
+    const modelMessages = convertToModelMessages(messages);
+
     const result = streamText({
       model: anthropic('claude-3-5-haiku-latest'),
-      messages: messages,
+      messages: modelMessages,
       system: systemPrompt,
       tools: copywritToolSet,
       toolChoice: "auto",
-      maxSteps: 10,
+      experimental_transform: [
+        markdownJoinerTransform(),
+        smoothStream({
+        delayInMs: 20,
+        chunking: 'word'
+      })],
       onChunk: async (chunk) => {
-          await streamProcessor.processChunk(chunk.chunk.type === 'text-delta' ? chunk.chunk.textDelta : '');
+          await streamProcessor.processChunk(chunk.chunk.type === 'text-delta' ? chunk.chunk.text : '');
       },
+    
+    });
+
+
+    // 5. Return the streaming response
+    return result.toUIMessageStreamResponse({
       onFinish: async (message) => {
-        // Flush any remaining buffer and update status to "done"
         await streamProcessor.flush();
-        
-        console.log("message", message);
+
+        const dbMessage = uiMessageToDBMessage(message.responseMessage);
 
         await convex.mutation(api.messages.addMessage, {
-          messageId: assistantMessageId,
+          ...dbMessage,
           threadId,
-          content: message.text,
-          role: "assistant",
-          parts: [{ type: "text", text: message.text }],
           streamId,
+          clerkUserId: userId,
           createdAt: Date.now(),
         });
       }
     })
-
-
-    // 5. Return the streaming response
-    return result.toDataStreamResponse()
     
   } catch (error) {
     console.error('Chat API error:', error);
